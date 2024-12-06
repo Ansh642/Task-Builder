@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
 const QuestionSchema = new mongoose.Schema({
-  type: { type: String, required: true }, // Categorize, Cloze, or Comprehension
-  content: { type: String, required: true },
-  options: { type: [String], default: [] }, // For Categorize
-  image: { type: String }, // Image URL for the question
+  type: { type: String, required: true },
+  content: { type: String, required: true }, // Added `content`
+  image: { type: String },
+  options: { type: Array, default: [] },
 });
 
 const FormSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: { type: String },
-  headerImage: { type: String }, // URL for the header image
+  description: { type: String, required: true },
+  headerImage: { type: String },
   questions: { type: [QuestionSchema], required: true },
 });
 

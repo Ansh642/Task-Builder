@@ -5,11 +5,15 @@ const Form = require('../models/form');
 
 router.post('/', async (req, res) => {
   try {
-    const form = new Form(req.body);
+    const { title, description, headerImage, questions } = req.body;
+
+    // Create and save the form
+    const form = new Form({ title, description, headerImage, questions });
     await form.save();
     res.status(201).json(form);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error saving form:', error);
+    res.status(400).json({ message: 'Failed to save the form', details: error.message });
   }
 });
 

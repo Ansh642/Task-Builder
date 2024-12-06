@@ -15,15 +15,34 @@ const FormEditor = () => {
   const addQuestion = (type) => {
     setForm((prevForm) => ({
       ...prevForm,
-      questions: [...prevForm.questions, { type, question: '', image: '', options: [] }],
+      questions: [
+        ...prevForm.questions,
+        { type, content: '', image: '', options: [] }, // Added `content`
+      ],
     }));
   };
 
+  const validateForm = () => {
+    if (!form.title.trim() || !form.description.trim()) {
+      toast.error('Title and description are required.');
+      return false;
+    }
+    for (const question of form.questions) {
+      if (!question.type || !question.content.trim()) {
+        toast.error('All questions must have a type and content.');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const saveForm = async () => {
+    if (!validateForm()) return;
+
     try {
+      console.log('Form payload:', form);
       const response = await axios.post('http://localhost:5000/api/forms', form);
       toast.success('Form saved successfully!');
-      // Reset form state
       setForm({
         title: '',
         description: '',
@@ -31,8 +50,8 @@ const FormEditor = () => {
         questions: [],
       });
     } catch (error) {
-      console.error('Error saving form:', error);
-      toast.error('Failed to save the form');
+      console.error('Error saving form:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to save the form');
     }
   };
 
@@ -73,15 +92,19 @@ const FormEditor = () => {
         </button>
       </div>
       {form.questions.map((question, index) => (
-        <Question
-          key={index}
-          question={question}
-          onChange={(updatedQuestion) => {
-            const newQuestions = [...form.questions];
-            newQuestions[index] = updatedQuestion;
-            setForm({ ...form, questions: newQuestions });
-          }}
-        />
+        <div key={index} className="mb-4 border p-2 rounded">
+          <h3 className="font-semibold">Question {index + 1} ({question.type})</h3>
+          <textarea
+            placeholder="Enter question content"
+            className="w-full p-2 mb-2 border rounded"
+            value={question.content}
+            onChange={(e) => {
+              const updatedQuestions = [...form.questions];
+              updatedQuestions[index].content = e.target.value;
+              setForm({ ...form, questions: updatedQuestions });
+            }}
+          />
+        </div>
       ))}
       <button onClick={saveForm} className="bg-purple-500 text-white p-2 rounded">
         Save Form
