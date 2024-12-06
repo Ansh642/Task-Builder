@@ -18,12 +18,17 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
+  console.log(`Received ID: ${req.params.id}`);
   try {
     const form = await Form.findById(req.params.id);
-    if (!form) throw new Error('Form not found');
+    if (!form) {
+      console.log('Form not found');
+      return res.status(404).json({ message: 'Form not found' });
+    }
     res.json(form);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    console.error('Error fetching form:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
